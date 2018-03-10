@@ -93,13 +93,13 @@ class Giftcards extends Secure_Controller
 
 		if($giftcard_id == -1 && trim($giftcard_number) == '')
 		{
-			$giftcard_number = $this->Giftcard->generate_unique_giftcard_name($this->input->post('value'));
+			$giftcard_number = $this->Giftcard->generate_unique_giftcard_name($this->input->post('giftcard_amount'));
 		}
 
 		$giftcard_data = array(
 			'record_time' => date('Y-m-d H:i:s'),
 			'giftcard_number' => $giftcard_number,
-			'value' => parse_decimals($this->input->post('value')),
+			'value' => parse_decimals($this->input->post('giftcard_amount')),
 			'person_id' => $this->input->post('person_id') == '' ? NULL : $this->input->post('person_id')
 		);
 
@@ -130,26 +130,9 @@ class Giftcards extends Secure_Controller
 
 	public function ajax_check_number_giftcard()
 	{
-	    $correct_fmt = new \NumberFormatter($this->config->item('number_locale'), \NumberFormatter::DECIMAL);
-	    
-	    $value = $this->input->post('value');
-	    if($correct_fmt->getAttribute(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL) == '.')
-	    {
-	        $regex = '/^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.]\d+)?$/';
-	    }
-	    else
-	    {
-	        $regex = '/^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[,]\d+)?$/';
-	    }
-	    
-	    if(preg_match($regex,$value) === 1)
-	    {
-	        echo json_encode(array('success' => TRUE));
-	    }
-	    else
-	    {
-	        echo json_encode(array('success' => FALSE));
-	    }
+	    $value = $this->input->post('giftcard_amount');
+	    $parsed_value = parse_decimals($value);
+		echo json_encode(array('success' => !empty($parsed_value), 'giftcard_amount' => $parsed_value));
 	}
 	
 	public function delete()
