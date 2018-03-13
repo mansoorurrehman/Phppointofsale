@@ -132,11 +132,8 @@ class Giftcards extends Secure_Controller
 	{
 	    $value = $this->input->post('giftcard_amount');
 	    $parsed_value = parse_decimals($value);
-            if(strcmp(strval($parsed_value),strval($value)) != 0)
-	    {
-	        $parsed_value = FALSE;
-	    }
-	    echo json_encode(array('success' => !empty($parsed_value), 'giftcard_amount' => $parsed_value));
+
+        echo json_encode(array('success' => !empty($parsed_value), 'giftcard_amount' => $parsed_value));
 	}
 	
 	public function delete()
