@@ -310,6 +310,9 @@ function parse_decimals($number)
 	$config = get_instance()->config;
 	$fmt = new \NumberFormatter( $config->item('number_locale'), \NumberFormatter::DECIMAL );
 
+	$fmt->format(1234567890.12300);
+	$fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS,$config->item('currency_decimals'));
+		
 	if (empty($config->item('thousands_separator')))
 	{
 		$fmt->setAttribute(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
@@ -317,11 +320,13 @@ function parse_decimals($number)
 
 	try
 	{
-	    if(strcmp(strval($fmt->parse($number)),strval($number)) != 0)
+	    $parsed = $fmt->parse($number);
+	    
+	    if(strcmp(strval($fmt->format($parsed)),strval($number)) != 0)
 	    {
-	        $number = FALSE;
+	        $parsed = FALSE;
 	    }
-	    return $fmt->parse($number);
+	    return parsed;
 	}
 	catch (Exception $e)
 	{
