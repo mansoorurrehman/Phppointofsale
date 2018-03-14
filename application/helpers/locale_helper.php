@@ -310,7 +310,6 @@ function parse_decimals($number)
 	$config = get_instance()->config;
 	$fmt = new \NumberFormatter( $config->item('number_locale'), \NumberFormatter::DECIMAL );
 
-	$fmt->format(1234567890.12300);
 	$fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS,$config->item('currency_decimals'));
 		
 	if (empty($config->item('thousands_separator')))
