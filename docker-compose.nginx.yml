@@ -1,0 +1,61 @@
+version: '2'
+
+volumes:
+    uploads:
+        driver: local
+
+services:
+    sqlscript:
+        build:
+            context: database/
+            dockerfile: Dockerfile
+
+    web:
+        image: nginx:alpine
+        links:
+            - mysql
+        ports:
+            - '80:80'
+        volumes:
+            - ../opensourcepos:/var/www/opensourcepos
+            - ./site.conf:/etc/nginx/conf.d/default.conf
+            - uploads:/var/www/opensourcepos/public/uploads
+        environment:
+            - FORCE_HTTPS=false
+            - PHP_TIMEZONE=UTC
+            - MYSQL_USERNAME=admin
+            - MYSQL_PASSWORD=pointofsale
+            - MYSQL_DB_NAME=ospos
+            - MYSQL_HOST_NAME=mysql
+
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile-php.nginx
+        volumes:
+            - ../opensourcepos:/var/www/opensourcepos
+            - ./log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
+
+    mysql:
+        image: mariadb:10.3.9
+        environment:
+            - MYSQL_ROOT_PASSWORD=pointofsale
+            - MYSQL_DATABASE=ospos
+            - MYSQL_USER=admin
+            - MYSQL_PASSWORD=pointofsale
+        ports:
+            - '3306:3306'
+        volumes_from:
+            - sqlscript
+ 
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+           - '8000:80'
+        links:
+            - mysql:mysql
+        environment:
+            - MYSQL_USERNAME=admin
+            - MYSQL_ROOT_PASSWORD=pointofsale
+            - PMA_HOST=mysql

@@ -1,0 +1,3 @@
+FROM php:fpm-alpine
+
+RUN echo "date.timezone = \"\${PHP_TIMEZONE}\"" > /usr/local/etc/php/conf.d/timezone.ini
